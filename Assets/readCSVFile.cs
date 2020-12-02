@@ -69,26 +69,20 @@ public class readCSVFile : MonoBehaviour
             
             //print(teste);
 
-            Vector3 x = new Vector3(d.x1, 0, d.y1);
-            //print(x);    
+            Vector3 x = new Vector3(d.x1, 0, d.y1);  
             Vector3 x2 = new Vector3(d.x2, 0, d.y2);
-            Vector3 aux = new Vector3(1, 0, 0);
-            Vector3 targetDir = x - x2;
+            Vector3 xAux = new Vector3(d.x1 - 10, 0, d.y1);
+            Vector3 targetDirX = x - x2;
 
             Vector3 y = new Vector3(d.x1, 70, d.y1); 
             Vector3 y2 = new Vector3(d.x2, 70, d.y2);
-            Vector3 targetDirAux = y - y2;
+            Vector3 yAux = new Vector3(d.x1 - 10, 70, d.y1);
+            Vector3 targetDirY = y - y2;
 
-            Vector3 result = Vector3.Cross(targetDir.normalized, Vector3.up) * offset;
-            Vector3 resultAux = Vector3.Cross(targetDirAux.normalized, Vector3.up) * offset;
-            Vector3 negativeOffset1 = x - result;
-            Vector3 positiveOffset1 = x + result;
-            Vector3 teste1 = negativeOffset1 + positiveOffset1;
-            Vector3 negativeOffset2 = x2 - result;
-            Vector3 positiveOffset2 = x2 + result;
-            Vector3 teste2 = negativeOffset2 + positiveOffset2;
-            Vector3 teste3 = teste1 - teste2;
-            Vector3 testeCrossP = Vector3.Cross(teste3.normalized, Vector3.up) * offset;
+            Vector3 result = Vector3.Cross(targetDirX.normalized, Vector3.up) * offset;
+            Vector3 resultXAux = result + result;
+            Vector3 resultAux = Vector3.Cross(targetDirY.normalized, Vector3.up) * offset;
+            Vector3 resultYAux = resultAux + resultAux;
             //print(teste);
             /*Vector3 xAux = new Vector3(d.x1, 0, d.y1 - 10); 
             Vector3 x2Aux = new Vector3(d.x2, 0, d.y2 - 10);
@@ -96,8 +90,6 @@ public class readCSVFile : MonoBehaviour
             Vector3 y2aux2 = new Vector3(d.x2, 70, d.y2 - 10);
             Vector3 targetDirAuxX = xAux - x2Aux;
             Vector3 targetDirAux2 = y2aux - y2aux2;
-
-
 
             Vector3 resultx2Aux = Vector3.Cross(targetDirAuxX.normalized, Vector3.up) * offset;
             Vector3 resulty2Aux = Vector3.Cross(targetDirAux2.normalized, Vector3.up) * offset;
@@ -115,21 +107,18 @@ public class readCSVFile : MonoBehaviour
 
             //Base Vertices
             
+            vertices.Add(x - resultXAux);
+            vertices.Add(x2 - resultXAux);
             vertices.Add(x);
             vertices.Add(x2);
-            vertices.Add(x + testeCrossP);
-            vertices.Add(x2 + testeCrossP);
 
             
             //Top Vertices
-            vertices.Add(y); 
+            vertices.Add(y - resultYAux); 
+            vertices.Add(y2 - resultYAux);
+            vertices.Add(y);
             vertices.Add(y2);
-            vertices.Add(y + resultAux);
-            vertices.Add(y2 + resultAux);
-            
-            
-            
-                                        
+                        
             //Chão 
             triangles.Add(0 + (i - 1) * 8);
             triangles.Add(1 + (i - 1) * 8);
@@ -223,16 +212,19 @@ public class readCSVFile : MonoBehaviour
 
                 Vector3 x1 = new Vector3(d.x1, 0, d.y1); //Base X and Z First values
                 Vector3 x2 = new Vector3(d.x2, 0, d.y2); //Base X and Z Second values
+                Vector3 x1Aux = new Vector3(d.x1 - 10, 0, d.y1);
+                Vector3 x2Aux = new Vector3(d.x2, 0, d.y2);
 
                 Vector3 y1 = new Vector3(d.x1, 70, d.y1); //Top X and Z First values
                 Vector3 y2 = new Vector3(d.x2, 70, d.y2); //Top X and Z Second values
+                Vector3 y1Aux = new Vector3(d.x1 - 10, 70, d.y1);
+                Vector3 y2Aux = new Vector3(d.x2 , 70, d.y2);
                 
                 Vector3 targetDirX = x1 - x2; // First - Second Base values to do Cross Product(Right hand rule)
                 Vector3 targetDirY = y1 - y2; // First - Second Top values to do Cross Product(Right hand rule)
 
                 Vector3 resultX = Vector3.Cross(targetDirX.normalized, Vector3.up) * offset; //Base Cross product to get an offset value
                 Vector3 resultY = Vector3.Cross(targetDirY.normalized, Vector3.up) * offset; //Top Cross product to get an offset value
-
                 //Creating Gizmos
 
                 Gizmos.color = Color.green; //Sphere Color
@@ -240,32 +232,32 @@ public class readCSVFile : MonoBehaviour
                 Gizmos.DrawSphere(x2, 1f); //Base X and Z Second values Sphere Gizmos
 
                 Gizmos.DrawSphere(y1, 1f); //Top X and Z First values Sphere Gizmos
-                Gizmos.DrawSphere(y2, 1f); //Top X and Z Second values Sphere Gizmos                
+                //Gizmos.DrawSphere(y2, 1f); //Top X and Z Second values Sphere Gizmos                
 
                 Gizmos.color = Color.red; //Negative Spheres and Lines Color
                 
                 //Negative Base Offset Values
-                Gizmos.DrawSphere(x1 - resultX, 1f);
-                Gizmos.DrawSphere(x2 - resultX, 1f);
-                Gizmos.DrawLine  (x1 - resultX, x2 - resultX);
+                Gizmos.DrawSphere(x1, 1f);
+                Gizmos.DrawSphere(x2, 1f);
+                Gizmos.DrawLine  (x1, x2);
                 
                 
                 //Negative Top Offset Values
-                Gizmos.DrawSphere(y1 - resultY, 1f);
-                Gizmos.DrawSphere(y2 - resultY, 1f);
-                Gizmos.DrawLine  (y1 - resultY, y2 - resultY);
+                Gizmos.DrawSphere(y1, 1f);
+                Gizmos.DrawSphere(y2, 1f);
+                Gizmos.DrawLine  (y1, y2);
 
                 Gizmos.color = Color.blue; //Positive Spheres and Lines Color
 
                 //Positive Base Offset Values
-                Gizmos.DrawSphere(x1 + resultX, 1f);
-                Gizmos.DrawSphere(x2 + resultX, 1f);
-                Gizmos.DrawLine  (x1 + resultX, x2 + resultX);
+                Gizmos.DrawSphere(x1 - resultX, 1f);
+                Gizmos.DrawSphere(x2 - resultX, 1f);
+                Gizmos.DrawLine  (x1 - resultX, x2 - resultX);
                 
                 //Positive Top Offset Values
-                Gizmos.DrawSphere(y1 + resultY, 1f);
-                Gizmos.DrawSphere(y2 + resultY, 1f);
-                Gizmos.DrawLine(y1 + resultY, y2 + resultY);
+                Gizmos.DrawSphere(y1Aux - resultY, 1f);
+                Gizmos.DrawSphere(y2 - resultY, 1f);
+                Gizmos.DrawLine(y1Aux - resultY, y2 - resultY);
                 
             } 
     }
