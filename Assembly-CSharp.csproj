@@ -55,8 +55,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Data.cs" />
-     <Compile Include="Assets\readCSVFile.cs" />
+     <Compile Include="Assets\Scripts\CameraController.cs" />
+     <Compile Include="Assets\Scripts\CubeMovement.cs" />
+     <Compile Include="Assets\Scripts\Data.cs" />
+     <Compile Include="Assets\Scripts\readCSVFile.cs" />
  <Reference Include="UnityEngine">
  <HintPath>R:/Unity/2019.4.2f1/Editor/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>
  </Reference>
