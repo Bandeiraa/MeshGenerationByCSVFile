@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -16,7 +17,7 @@ public class readCSVFile : MonoBehaviour
     { 
         mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
-        TextAsset graphdata = Resources.Load<TextAsset>("Graph"); //Reading CSV File named as Graph     
+        TextAsset graphdata = Resources.Load<TextAsset>("Grapho"); //Reading CSV File named as Graph     
 
         string[] data = graphdata.text.Split(new char[] { '\n' });
 
@@ -48,20 +49,23 @@ public class readCSVFile : MonoBehaviour
 
             Vector3 result = Vector3.Cross(targetDirX.normalized, Vector3.up) * offset; //(Base) Cross product to get an offset value
             Vector3 resultXAux = result + result; //Multiplying Base Cross Product by two
+            Vector3 anotherResult = Vector3.Cross(result.normalized, Vector3.up) * offset;
+
             Vector3 resultAux = Vector3.Cross(targetDirY.normalized, Vector3.up) * offset;//(Top) Cross product to get an offset value
             Vector3 resultYAux = resultAux + resultAux; //Multiplying Top Cross Product by two
+            Vector3 anotherYResult = Vector3.Cross(resultAux.normalized, Vector3.up) * offset;
             
             //Creating 4 Base Vertices
-            vertices.Add(x - resultXAux);
-            vertices.Add(x2 - resultXAux);
-            vertices.Add(x);
-            vertices.Add(x2);
+            vertices.Add(x - (result + anotherResult));
+            vertices.Add(x2 - (result + anotherResult));
+            vertices.Add(x + (result + anotherResult));
+            vertices.Add(x2 + (result + anotherResult));
           
             //Creating 4 Top Vertices
-            vertices.Add(y - resultYAux); 
-            vertices.Add(y2 - resultYAux);
-            vertices.Add(y);
-            vertices.Add(y2);
+            vertices.Add(y - (resultAux + anotherYResult)); 
+            vertices.Add(y2 - (resultAux + anotherYResult));
+            vertices.Add(y + (resultAux + anotherYResult));
+            vertices.Add(y2 + (resultAux + anotherYResult));
                         
             //Base Face (Floor Image at Vertices Image Representation folder)
             triangles.Add(0 + (i - 1) * 8);
@@ -135,7 +139,7 @@ public class readCSVFile : MonoBehaviour
         //Gizmos - > Red Spheres and Lines(Always in Left) are values from negative offset of Green Spheres
         //Gizmos - > Blue Spheres and Lines(Always in Right) are values from positive offset of Green Spheres
             GetComponent<MeshFilter>().mesh = mesh;
-            TextAsset graphdata = Resources.Load<TextAsset>("Graph");     
+            TextAsset graphdata = Resources.Load<TextAsset>("Grapho");     
 
             string[] data = graphdata.text.Split(new char[] { '\n' });
 
@@ -148,17 +152,18 @@ public class readCSVFile : MonoBehaviour
                 int.TryParse(row[1], out d.y1);
                 int.TryParse(row[2], out d.x2);
                 int.TryParse(row[3], out d.y2);
-
+                
                 //Creating Vectors with x, y and z values from the current CSV File Points
                 
                 //X
                 Vector3 x1 = new Vector3(d.x1, 0, d.y1); //Base X and Z First values
                 Vector3 x2 = new Vector3(d.x2, 0, d.y2); //Base X and Z Second values
-                
+
                 Vector3 targetDirX = x1 - x2; // First - Second Base values to do Cross Product(Right hand rule)
 
                 Vector3 resultX = Vector3.Cross(targetDirX.normalized, Vector3.up) * offset; //Base Cross product to get an offset value
                 Vector3 resultXAux = resultX + resultX; // Multiplying Base Cross Product by two
+                Vector3 resultX2 = Vector3.Cross(resultX.normalized, Vector3.up) * offset;
 
                 //Y
                 Vector3 y1 = new Vector3(d.x1, 70, d.y1); //Top X and Z First values
@@ -173,8 +178,40 @@ public class readCSVFile : MonoBehaviour
                 Gizmos.color = Color.green; //Sphere Color
                 Gizmos.DrawSphere(x1, 1f); //Base X and Z First values Sphere Gizmos
                 Gizmos.DrawSphere(x2, 1f); //Base X and Z Second values Sphere Gizmos
-                Gizmos.DrawSphere(y1, 1f); //Top X and Z First values Sphere Gizmos
-               
+                //Gizmos.DrawSphere(y1, 1f); //Top X and Z First values Sphere Gizmos
+                //Gizmos.DrawSphere(y1, 1f); //Top X and Z Second values Sphere Gizmos
+
+                Gizmos.DrawLine(x1, x2);//, x2);
+                //Gizmos.DrawLine(y1, y2);
+
+                Gizmos.color = Color.red;
+                Gizmos.DrawSphere(x1 + (resultX + resultX2), 1f); //Top Left
+                Gizmos.DrawSphere(x2 - (resultX + resultX2), 1f); //Top Right
+                Gizmos.DrawSphere(x2 + (resultX + resultX2), 1f); //Bottom Left
+                Gizmos.DrawSphere(x1 - (resultX + resultX2), 1f); //Bottom Right
+
+                //Gizmos.DrawLine(x1 - (resultX + resultX2), x1 + (resultX + resultX2));
+                //Gizmos.DrawLine(x2 - (resultX + resultX2), x2 + (resultX + resultX2));
+                Gizmos.DrawLine(x1 - resultX, x1 + resultX);
+                Gizmos.DrawLine(x2 - resultX, x2 + resultX);
+                //Gizmos.DrawLine(x1 + (resultX + resultX2), x2 - (resultX + resultX2));
+
+                //Gizmos.DrawLine(x1 - (resultX + resultX2), x2 - (resultX + resultX2));
+                //Gizmos.DrawLine(x1 + (resultX + resultX2), x2 + (resultX + resultX2));
+                Gizmos.DrawLine(x1 - resultX, x2 - resultX);
+                Gizmos.DrawLine(x1 + resultX, x2 + resultX);
+
+                //Gizmos.DrawLine(x1 + (resultX + resultX2), x2 + (resultX + resultX2));
+                //Gizmos.DrawLine(x1 - (resultX + resultX2), x2 - (resultX + resultX2));
+                //Gizmos.DrawLine(x2 + (resultX + resultX2), x2 - (resultX + resultX2));
+                //Gizmos.DrawLine(x2 - (resultX + resultX2), x2 + (resultX + resultX2));
+                
+                
+                //Gizmos.DrawSphere(x2 - (resultXAux + resultX2), 1f); //- resultXAux
+                //Gizmos.DrawSphere(x2 + (resultXAux + resultX2), 1f); //- resultXAux
+                //Gizmos.DrawLine  (x1 - (resultXAux + resultX2), x2 - (resultXAux + resultX2));
+                //Gizmos.DrawLine (x1 + (resultXAux + resultX2), x2 + (resultXAux + resultX2));
+               /*
                 Gizmos.color = Color.red; //Spheres and Lines Color
     
                 //Negative Base Offset Values
@@ -190,14 +227,15 @@ public class readCSVFile : MonoBehaviour
                 Gizmos.color = Color.blue; //Positive Spheres and Lines Color
 
                 //Positive Base Offset Values
-                Gizmos.DrawSphere(x1 - resultXAux, 1f);
-                Gizmos.DrawSphere(x2 - resultXAux, 1f);
+                Gizmos.DrawSphere(x1 - resultXAux, 1f); //- resultXAux
+                Gizmos.DrawSphere(x2 - resultXAux, 1f); //- resultXAux
                 Gizmos.DrawLine  (x1 - resultXAux, x2 - resultXAux);
                 
                 //Positive Top Offset Values
-                Gizmos.DrawSphere(y1 - resultYAux, 1f);
-                Gizmos.DrawSphere(y2 - resultYAux, 1f);
+                Gizmos.DrawSphere(y1 - resultYAux, 1f); //- resultYAux
+                Gizmos.DrawSphere(y2 - resultYAux, 1f); //- resultYAux
                 Gizmos.DrawLine(y1 - resultYAux, y2 - resultYAux);
+                */
             } 
     }
 }
