@@ -57,14 +57,14 @@ public class readCSVFile : MonoBehaviour
             
             //Creating 4 Base Vertices
             vertices.Add(x - (result + anotherResult));
-            vertices.Add(x2 - (result + anotherResult));
-            vertices.Add(x + (result + anotherResult));
+            vertices.Add(x2 - (result - anotherResult));
+            vertices.Add(x + (result - anotherResult));
             vertices.Add(x2 + (result + anotherResult));
           
             //Creating 4 Top Vertices
             vertices.Add(y - (resultAux + anotherYResult)); 
-            vertices.Add(y2 - (resultAux + anotherYResult));
-            vertices.Add(y + (resultAux + anotherYResult));
+            vertices.Add(y2 - (resultAux - anotherYResult));
+            vertices.Add(y + (resultAux - anotherYResult));
             vertices.Add(y2 + (resultAux + anotherYResult));
                         
             //Base Face (Floor Image at Vertices Image Representation folder)
@@ -186,21 +186,29 @@ public class readCSVFile : MonoBehaviour
                 //Gizmos.DrawLine(y1, y2);
 
                 Gizmos.color = Color.red;
-                Gizmos.DrawSphere(x1 + (resultX + resultX2), 1f); //Top Left
-                Gizmos.DrawSphere(x2 - (resultX + resultX2), 1f); //Top Right
+                //Gizmos.DrawSphere(x1 + (resultX + resultX2), 1f); //Top Left
+                //Gizmos.DrawSphere(x2 - (resultX + resultX2), 1f); //Top Right
                 Gizmos.DrawSphere(x2 + (resultX + resultX2), 1f); //Bottom Left
                 Gizmos.DrawSphere(x1 - (resultX + resultX2), 1f); //Bottom Right
-
+                Gizmos.DrawSphere(x1 + (resultX - resultX2), 1f);
+                //Gizmos.DrawSphere(x1 - (resultX - resultX2), 1f);
+                Gizmos.DrawSphere(x2 - (resultX - resultX2), 1f); //Top Right
+                //Gizmos.DrawSphere(x2 + (resultX - resultX2), 1f); //Bottom Left
                 //Gizmos.DrawLine(x1 - (resultX + resultX2), x1 + (resultX + resultX2));
                 //Gizmos.DrawLine(x2 - (resultX + resultX2), x2 + (resultX + resultX2));
-                Gizmos.DrawLine(x1 - resultX, x1 + resultX);
-                Gizmos.DrawLine(x2 - resultX, x2 + resultX);
+                //Gizmos.DrawLine(x1 - resultX, x1 + resultX);
+                //Gizmos.DrawLine(x2 - resultX, x2 + resultX);
                 //Gizmos.DrawLine(x1 + (resultX + resultX2), x2 - (resultX + resultX2));
-
+                Gizmos.DrawLine(x1 + (resultX - resultX2), x2 + (resultX + resultX2));
+                Gizmos.DrawLine(x1 - (resultX + resultX2), x2 - (resultX - resultX2));
+                //Gizmos.DrawLine(x1 + (resultX - resultX2), x2 + (resultX - resultX2));
+                Gizmos.DrawLine(x1 + (resultX - resultX2), x1 - (resultX + resultX2));
+                Gizmos.DrawLine(x2 + (resultX + resultX2), x2 - (resultX - resultX2));
+                //Gizmos.DrawLine(x1 + (resultX - resultX2), x2 + (resultX + resultX2));
                 //Gizmos.DrawLine(x1 - (resultX + resultX2), x2 - (resultX + resultX2));
                 //Gizmos.DrawLine(x1 + (resultX + resultX2), x2 + (resultX + resultX2));
-                Gizmos.DrawLine(x1 - resultX, x2 - resultX);
-                Gizmos.DrawLine(x1 + resultX, x2 + resultX);
+                //Gizmos.DrawLine(x1 - resultX, x2 - resultX);
+                //Gizmos.DrawLine(x1 + resultX, x2 + resultX);
 
                 //Gizmos.DrawLine(x1 + (resultX + resultX2), x2 + (resultX + resultX2));
                 //Gizmos.DrawLine(x1 - (resultX + resultX2), x2 - (resultX + resultX2));
