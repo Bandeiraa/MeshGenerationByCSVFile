@@ -130,7 +130,8 @@ public class readCSVFile : MonoBehaviour
         mesh.Clear();
         mesh.vertices = vertices.ToArray();
         mesh.triangles = triangles.ToArray();
-        mesh.RecalculateNormals();   
+        mesh.RecalculateNormals();
+        gameObject.AddComponent<MeshCollider>();
     }
 
     private void OnDrawGizmos()
