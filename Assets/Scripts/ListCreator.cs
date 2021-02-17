@@ -10,6 +10,7 @@ public class ListCreator : MonoBehaviour {
     [SerializeField]
     private GameObject item = null;
 
+    [SerializeField] private float initialOffset= 30;
     [SerializeField] private float verticalOffset = 60;
     [SerializeField]
     private RectTransform content = null;
@@ -19,7 +20,7 @@ public class ListCreator : MonoBehaviour {
     void Start () {
     
         //setContent Holder Height;
-        content.sizeDelta = new Vector2(0, houseItensSo.Length);
+        content.sizeDelta = new Vector2(0, houseItensSo.Length * verticalOffset);
         
         
 
@@ -27,7 +28,7 @@ public class ListCreator : MonoBehaviour {
         {
             
             // 60 width of item
-            float spawnY = i * verticalOffset;
+            float spawnY = i * verticalOffset + initialOffset;
             //newSpawn Position
             Vector3 pos = new Vector3(0, -spawnY);
             //instantiate item
