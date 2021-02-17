@@ -1,46 +1,49 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
+using UnityEngine.Serialization;
 
+
+// [ExecuteInEditMode]
 public class ListCreator : MonoBehaviour {
 
-    [SerializeField]
-    private Transform SpawnPoint = null;
 
     [SerializeField]
     private GameObject item = null;
 
+    [SerializeField] private float verticalOffset = 60;
     [SerializeField]
     private RectTransform content = null;
 
-    [SerializeField]
-    private int numberOfItems = 3;
-
-    public string[] itemNames = null;
-    public Sprite[] itemImages = null;
-
+    public HouseItensSO[] houseItensSo = null;
     // Use this for initialization
     void Start () {
-
+    
         //setContent Holder Height;
-        content.sizeDelta = new Vector2(0, numberOfItems * 60);     
+        content.sizeDelta = new Vector2(0, houseItensSo.Length);
+        
+        
 
-        for (int i = 0; i < numberOfItems; i++)
+        for (int i = 0; i < houseItensSo.Length; i++)
         {
+            
             // 60 width of item
-            float spawnY = i * 60;
+            float spawnY = i * verticalOffset;
             //newSpawn Position
-            Vector3 pos = new Vector3(SpawnPoint.position.x, -spawnY, SpawnPoint.position.z);
+            Vector3 pos = new Vector3(0, -spawnY);
             //instantiate item
-            GameObject SpawnedItem = Instantiate(item, pos, SpawnPoint.rotation);
+            GameObject spawnedItem = Instantiate(item,  transform);
             //setParent
-            SpawnedItem.transform.SetParent(SpawnPoint, false);
+            spawnedItem.transform.localPosition = pos;
             //get ItemDetails Component
-            ItemDetails itemDetails = SpawnedItem.GetComponent<ItemDetails>();
+            ItemDetails itemDetails = spawnedItem.GetComponent<ItemDetails>();
             //set name
-            itemDetails.text.text = itemNames[i];
+            itemDetails.text.text = houseItensSo[i].objectName;
             //set image
-            itemDetails.image.sprite = itemImages[i];  
+            itemDetails.image.sprite = houseItensSo[i].objectSprite;  
 
 
         }
     }
+
+  
 }
