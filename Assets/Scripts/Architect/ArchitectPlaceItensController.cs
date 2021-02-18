@@ -76,6 +76,8 @@ public class ArchitectPlaceItensController : MonoBehaviour
         _ableToSelect = value;
         SpawnItem();
     }
+    
+    
 
     private void FixedUpdate()
     {
