@@ -12,7 +12,7 @@ public class ItemDetails : MonoBehaviour {
 
     public void GetComponent()
     {
-        print(text.text);
+        // print(text.text);
     }
 
 }

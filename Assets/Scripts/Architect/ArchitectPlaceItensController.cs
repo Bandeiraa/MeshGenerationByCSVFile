@@ -12,6 +12,7 @@ public class ArchitectPlaceItensController : MonoBehaviour
     [SerializeField] private LayerMask mLayerMask;
     [SerializeField] private LayerMask placebleAreaMask;
 
+    private bool _ableToSelect = false;
     private ArchitectController _playerController;
 
 
@@ -22,19 +23,24 @@ public class ArchitectPlaceItensController : MonoBehaviour
 
     private void Start()
     {
-        _playerController.Mouse.MouseSelect.performed += _ => SpawnItem();
+        // _playerController.Mouse.MouseSelect.performed += _ => SpawnItem();
     }
 
     private void SpawnItem()
     {
-        Vector3 mousePosition = _playerController.Mouse.MousePosition.ReadValue<Vector2>();
-        mousePosition = mainCamera.ScreenToWorldPoint(mousePosition);
-        mousePosition.y = worldY;
-        Vector3 placeblePosition = mousePosition;
-        placeblePosition.y -= selectedObject.localScale.y / 2;
-        if (VerifyCollisions(placeblePosition, placebleAreaMask) && VerifyCollisions(mousePosition, mLayerMask))
+        if (_ableToSelect)
         {
-            Instantiate(selectedObject, mousePosition, Quaternion.identity);
+            _ableToSelect = false;
+            Vector3 mousePosition = _playerController.Mouse.MousePosition.ReadValue<Vector2>();
+            mousePosition = mainCamera.ScreenToWorldPoint(mousePosition);
+            mousePosition.y = worldY;
+            Vector3 placeblePosition = mousePosition;
+            placeblePosition.y -= selectedObject.localScale.y / 2;
+            if (VerifyCollisions(placeblePosition, placebleAreaMask) && VerifyCollisions(mousePosition, mLayerMask))
+            {
+                Instantiate(selectedObject, mousePosition, Quaternion.identity);
+            }
+            
         }
     }
 
@@ -64,6 +70,12 @@ public class ArchitectPlaceItensController : MonoBehaviour
         }
     }
 
+    public void SetAbleToClick(bool value)
+    {
+
+        _ableToSelect = value;
+        SpawnItem();
+    }
 
     private void FixedUpdate()
     {
