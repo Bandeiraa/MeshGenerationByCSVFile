@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.Serialization;
 
 public class ArchitectPlaceItensController : MonoBehaviour
@@ -12,7 +13,7 @@ public class ArchitectPlaceItensController : MonoBehaviour
     [SerializeField] private LayerMask mLayerMask;
     [SerializeField] private LayerMask placebleAreaMask;
 
-    private bool _ableToSelect = false;
+    [SerializeField] private HouseObject lastItemSelected;
     private ArchitectController _playerController;
 
 
@@ -23,24 +24,39 @@ public class ArchitectPlaceItensController : MonoBehaviour
 
     private void Start()
     {
-        // _playerController.Mouse.MouseSelect.performed += _ => SpawnItem();
+        _playerController.Mouse.MouseSelect.performed += _ => SpawnItem();
     }
 
     private void SpawnItem()
     {
-        if (_ableToSelect)
+        if (!EventSystem.current.IsPointerOverGameObject())
         {
-            _ableToSelect = false;
+            // _ableToSelect = false;
             Vector3 mousePosition = _playerController.Mouse.MousePosition.ReadValue<Vector2>();
             mousePosition = mainCamera.ScreenToWorldPoint(mousePosition);
             mousePosition.y = worldY;
             Vector3 placeblePosition = mousePosition;
             placeblePosition.y -= selectedObject.localScale.y / 2;
-            if (VerifyCollisions(placeblePosition, placebleAreaMask) && VerifyCollisions(mousePosition, mLayerMask))
+
+            if (IsPlacebleArea(placeblePosition))
             {
-                Instantiate(selectedObject, mousePosition, Quaternion.identity);
+                var hittedObject = IsHittingObject(mousePosition);
+                if (!hittedObject || lastItemSelected != hittedObject.GetComponent<HouseObject>())
+                {
+                    Transform newObject;
+                    newObject = !hittedObject ? 
+                        Instantiate(selectedObject, mousePosition, Quaternion.identity, transform) : 
+                        hittedObject.transform;
+                    
+                    if(lastItemSelected)
+                        lastItemSelected.ChangeItemState(false);
+                    
+                    lastItemSelected= newObject.GetComponent<HouseObject>();
+                    lastItemSelected.ChangeItemState(true);
+                }
+        
+                
             }
-            
         }
     }
 
@@ -54,30 +70,25 @@ public class ArchitectPlaceItensController : MonoBehaviour
         _playerController.Disable();
     }
 
-    private bool VerifyCollisions(Vector3 position, LayerMask mask)
+    private bool IsPlacebleArea(Vector3 position)
     {
         Collider[] result = new Collider[1];
         int size = Physics.OverlapBoxNonAlloc(position, selectedObject.localScale / 2, result, Quaternion.identity,
-            mask);
+            placebleAreaMask);
 
-        if (mask == placebleAreaMask)
-        {
-            return size == 1;
-        }
-        else
-        {
-            return size == 0;
-        }
+
+        return size == 1;
     }
 
-    public void SetAbleToClick(bool value)
+    private Collider IsHittingObject(Vector3 position)
     {
+        Collider[] hitColliders = Physics.OverlapBox(position, selectedObject.localScale / 2,
+            Quaternion.identity, mLayerMask);
 
-        _ableToSelect = value;
-        SpawnItem();
+
+        return hitColliders.Length!=0 ? hitColliders[0] : null;
     }
-    
-    
+
 
     private void FixedUpdate()
     {

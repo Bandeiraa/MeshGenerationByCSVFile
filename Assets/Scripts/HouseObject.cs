@@ -4,20 +4,16 @@ using UnityEngine;
 
 public class HouseObject : MonoBehaviour
 {
+
+    private Outline _objectOutline;
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
-        
+        _objectOutline = GetComponent<Outline>();
     }
 
-    // Update is called once per frame
-    void Update()
+    public void ChangeItemState(bool activate)
     {
-        
-    }
-
-    public void RotateItem()
-    {
-        print("roroda");
+        _objectOutline.enabled = activate;
     }
 }
