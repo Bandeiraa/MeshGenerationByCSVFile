@@ -12,6 +12,9 @@ public class ArchitectPlaceItensController : MonoBehaviour
     [SerializeField] private float worldY = 0;
     [SerializeField] private LayerMask mLayerMask;
     [SerializeField] private LayerMask placebleAreaMask;
+    
+    public event Action<HouseObject> SelectedHouseObjectUpdated = delegate { };
+    public event Action MouseButtonUnclicked = delegate { };
 
     [SerializeField] private HouseObject lastItemSelected;
     private ArchitectController _playerController;
@@ -25,6 +28,8 @@ public class ArchitectPlaceItensController : MonoBehaviour
     private void Start()
     {
         _playerController.Mouse.MouseSelect.performed += _ => SpawnItem();
+
+        
     }
 
     private void SpawnItem()
@@ -36,7 +41,7 @@ public class ArchitectPlaceItensController : MonoBehaviour
             mousePosition = mainCamera.ScreenToWorldPoint(mousePosition);
             mousePosition.y = worldY;
             Vector3 placeblePosition = mousePosition;
-            placeblePosition.y -= selectedObject.localScale.y / 2;
+            placeblePosition.y = 0.007f;
 
             if (IsPlacebleArea(placeblePosition))
             {
@@ -45,17 +50,20 @@ public class ArchitectPlaceItensController : MonoBehaviour
                 {
                     Transform newObject;
                     newObject = !hittedObject ? 
-                        Instantiate(selectedObject, mousePosition, Quaternion.identity, transform) : 
-                        hittedObject.transform;
-                    
-                    if(lastItemSelected)
+                        Instantiate(selectedObject, placeblePosition, Quaternion.identity, transform)
+                        : hittedObject.transform;
+
+                    if (lastItemSelected)
+                    {
                         lastItemSelected.ChangeItemState(false);
-                    
-                    lastItemSelected= newObject.GetComponent<HouseObject>();
+                    }
+
+                    lastItemSelected = newObject.GetComponentInParent<HouseObject>();
                     lastItemSelected.ChangeItemState(true);
+                    
+                    SelectedHouseObjectUpdated(lastItemSelected);
+
                 }
-        
-                
             }
         }
     }
@@ -86,7 +94,7 @@ public class ArchitectPlaceItensController : MonoBehaviour
             Quaternion.identity, mLayerMask);
 
 
-        return hitColliders.Length!=0 ? hitColliders[0] : null;
+        return hitColliders.Length != 0 ? hitColliders[0] : null;
     }
 
 

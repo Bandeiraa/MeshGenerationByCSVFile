@@ -9,7 +9,8 @@ public class ItemDetails : MonoBehaviour {
     public TextMeshProUGUI text = null;
     //Item Image
     public Image image = null;
-
+    
+    
     public void GetComponent()
     {
         // print(text.text);

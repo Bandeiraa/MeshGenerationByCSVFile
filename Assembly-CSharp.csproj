@@ -66,6 +66,7 @@
      <Compile Include="Assets\Scripts\HouseObject.cs" />
      <Compile Include="Assets\Scripts\Hud\ItemDetails.cs" />
      <Compile Include="Assets\Scripts\Hud\ListCreator.cs" />
+     <Compile Include="Assets\Scripts\Hud\TransformationsHud.cs" />
      <Compile Include="Assets\Scripts\PlayerInputs.cs" />
      <Compile Include="Assets\Scripts\ScriptableOblects\HouseItensSO.cs" />
      <Compile Include="Assets\Scripts\readCSVFile.cs" />
