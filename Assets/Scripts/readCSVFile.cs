@@ -2,135 +2,138 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [RequireComponent(typeof(MeshFilter))]
 public class readCSVFile : MonoBehaviour
 {
-    [SerializeField] float offset = 30;
-    Mesh mesh;
-    List<Vector3> vertices;
-    List<int> triangles;
+    [SerializeField] float widthOffset = 30;
+    [SerializeField] private float worldScale = 10;
+    [SerializeField] private float wallSize;
+    private Mesh _mesh;
+    private List<Vector3> _vertices;
+    private List<int> _triangles;
 
-    List<Data> datas = new List<Data>();
+    private List<Data> _datas = new List<Data>();
 
     void Start()
     { 
-        mesh = new Mesh();
-        GetComponent<MeshFilter>().mesh = mesh;
+        _mesh = new Mesh();
+        GetComponent<MeshFilter>().mesh = _mesh;
         TextAsset graphdata = Resources.Load<TextAsset>("Grapho"); //Reading CSV File named as Graph     
 
         string[] data = graphdata.text.Split(new char[] { '\n' });
 
-        vertices = new List<Vector3>();
-        triangles = new List<int>();
+        _vertices = new List<Vector3>();
+        _triangles = new List<int>();
     
         for(int i = 1; i < data.Length - 1; i++) {
             string[] row = data[i].Split(new char[]{','});
             
-            Data d = new Data();
+            Data newData = new Data();
             
-            int.TryParse(row[0], out d.x1);
-            int.TryParse(row[1], out d.y1);
-            int.TryParse(row[2], out d.x2);
-            int.TryParse(row[3], out d.y2);
-            
+            int.TryParse(row[0], out newData.x1 );
+            int.TryParse(row[1], out newData.y1);
+            int.TryParse(row[2], out newData.x2);
+            int.TryParse(row[3], out newData.y2);
+            newData.ChangeScale(worldScale);
             //Parsing the CSV file values in 4 variables
-            datas.Add(d);
+            _datas.Add(newData);
  
-            Vector3 x = new Vector3(d.x1, 0, d.y1);  //(Base) Creating a Vector3 with X and Z initial values
-            Vector3 x2 = new Vector3(d.x2, 0, d.y2); //(Base) Creating a Vector3 with X and Z final values
+            Vector3 x = new Vector3(newData.x1, 0, newData.y1);  //(Base) Creating a Vector3 with X and Z initial values
+            Vector3 x2 = new Vector3(newData.x2, 0, newData.y2); //(Base) Creating a Vector3 with X and Z final values
             
             Vector3 targetDirX = x - x2; //(Base) Variable to store the difference between initial and final X and Z values
 
-            Vector3 y = new Vector3(d.x1, 70, d.y1);  //(Top) Creating a Vector3 with X and Z initial values
-            Vector3 y2 = new Vector3(d.x2, 70, d.y2); //(Top) Creating a Vector3 with X and Z final values
+            Vector3 y = new Vector3(newData.x1, wallSize, newData.y1);  //(Top) Creating a Vector3 with X and Z initial values
+            Vector3 y2 = new Vector3(newData.x2, wallSize, newData.y2); //(Top) Creating a Vector3 with X and Z final values
             
             Vector3 targetDirY = y - y2; //(Top) Variable to store the difference between initial and final X and Z values
 
-            Vector3 result = Vector3.Cross(targetDirX.normalized, Vector3.up) * offset; //(Base) Cross product to get an offset value
-            Vector3 resultXAux = result + result; //Multiplying Base Cross Product by two
-            Vector3 anotherResult = Vector3.Cross(result.normalized, Vector3.up) * offset;
+            Vector3 result = Vector3.Cross(targetDirX.normalized, Vector3.up) * widthOffset; //(Base) Cross product to get an offset value
+            // Vector3 resultXAux = result + result; //Multiplying Base Cross Product by two
+            Vector3 anotherResult = Vector3.Cross(result.normalized, Vector3.up) * widthOffset;
 
-            Vector3 resultAux = Vector3.Cross(targetDirY.normalized, Vector3.up) * offset;//(Top) Cross product to get an offset value
-            Vector3 resultYAux = resultAux + resultAux; //Multiplying Top Cross Product by two
-            Vector3 anotherYResult = Vector3.Cross(resultAux.normalized, Vector3.up) * offset;
+            Vector3 resultAux = Vector3.Cross(targetDirY.normalized, Vector3.up) * widthOffset;//(Top) Cross product to get an offset value
+            // Vector3 resultYAux = resultAux + resultAux; //Multiplying Top Cross Product by two
+            Vector3 anotherYResult = Vector3.Cross(resultAux.normalized, Vector3.up) * widthOffset;
             
             //Creating 4 Base Vertices
-            vertices.Add(x - (result + anotherResult));
-            vertices.Add(x2 - (result - anotherResult));
-            vertices.Add(x + (result - anotherResult));
-            vertices.Add(x2 + (result + anotherResult));
+            _vertices.Add(x - (result + anotherResult));
+            _vertices.Add(x2 - (result - anotherResult));
+            _vertices.Add(x + (result - anotherResult));
+            _vertices.Add(x2 + (result + anotherResult));
           
             //Creating 4 Top Vertices
-            vertices.Add(y - (resultAux + anotherYResult)); 
-            vertices.Add(y2 - (resultAux - anotherYResult));
-            vertices.Add(y + (resultAux - anotherYResult));
-            vertices.Add(y2 + (resultAux + anotherYResult));
+            _vertices.Add(y - (resultAux + anotherYResult)); 
+            _vertices.Add(y2 - (resultAux - anotherYResult));
+            _vertices.Add(y + (resultAux - anotherYResult));
+            _vertices.Add(y2 + (resultAux + anotherYResult));
                         
             //Base Face (Floor Image at Vertices Image Representation folder)
-            triangles.Add(0 + (i - 1) * 8);
-            triangles.Add(1 + (i - 1) * 8);
-            triangles.Add(2 + (i - 1) * 8);
+            _triangles.Add(0 + (i - 1) * 8);
+            _triangles.Add(1 + (i - 1) * 8);
+            _triangles.Add(2 + (i - 1) * 8);
             //1st triangle
-            triangles.Add(2 + (i - 1) * 8);
-            triangles.Add(1 + (i - 1) * 8);
-            triangles.Add(3 + (i - 1) * 8);    
+            _triangles.Add(2 + (i - 1) * 8);
+            _triangles.Add(1 + (i - 1) * 8);
+            _triangles.Add(3 + (i - 1) * 8);    
             //2nd triangle
              
             //Top Face (Top Image at Vertices Image Representation folder)
-            triangles.Add(4 + (i - 1) * 8);
-            triangles.Add(5 + (i - 1) * 8);
-            triangles.Add(6 + (i - 1) * 8);
+            _triangles.Add(4 + (i - 1) * 8);
+            _triangles.Add(5 + (i - 1) * 8);
+            _triangles.Add(6 + (i - 1) * 8);
             //1st triangle 
-            triangles.Add(6 + (i - 1) * 8);
-            triangles.Add(5 + (i - 1) * 8);
-            triangles.Add(7 + (i - 1) * 8); 
+            _triangles.Add(6 + (i - 1) * 8);
+            _triangles.Add(5 + (i - 1) * 8);
+            _triangles.Add(7 + (i - 1) * 8); 
             //2nd triangle  
 
             //Back Face (Back Image at Vertices Image Representation folder)
-            triangles.Add(0 + (i - 1) * 8);
-            triangles.Add(4 + (i - 1) * 8);
-            triangles.Add(2 + (i - 1) * 8);
+            _triangles.Add(0 + (i - 1) * 8);
+            _triangles.Add(4 + (i - 1) * 8);
+            _triangles.Add(2 + (i - 1) * 8);
             //1st triangle 
-            triangles.Add(2 + (i - 1) * 8);
-            triangles.Add(4 + (i - 1) * 8);
-            triangles.Add(6 + (i - 1) * 8); 
+            _triangles.Add(2 + (i - 1) * 8);
+            _triangles.Add(4 + (i - 1) * 8);
+            _triangles.Add(6 + (i - 1) * 8); 
             //2nd triangle  
 
             //Front Face (Front Image at Vertices Image Representation folder)
-            triangles.Add(1 + (i - 1) * 8);
-            triangles.Add(7 + (i - 1) * 8);
-            triangles.Add(5 + (i - 1) * 8);
+            _triangles.Add(1 + (i - 1) * 8);
+            _triangles.Add(7 + (i - 1) * 8);
+            _triangles.Add(5 + (i - 1) * 8);
             //1st triangle 
-            triangles.Add(3 + (i - 1) * 8);
-            triangles.Add(7 + (i - 1) * 8);
-            triangles.Add(1 + (i - 1) * 8); 
+            _triangles.Add(3 + (i - 1) * 8);
+            _triangles.Add(7 + (i - 1) * 8);
+            _triangles.Add(1 + (i - 1) * 8); 
             //2nd triangle
             
             //Left Face (Left Image at Vertices Image Representation folder)
-            triangles.Add(1 + (i - 1) * 8);
-            triangles.Add(5 + (i - 1) * 8);
-            triangles.Add(0 + (i - 1) * 8);
+            _triangles.Add(1 + (i - 1) * 8);
+            _triangles.Add(5 + (i - 1) * 8);
+            _triangles.Add(0 + (i - 1) * 8);
             //1st triangle 
-            triangles.Add(0 + (i - 1) * 8);
-            triangles.Add(5 + (i - 1) * 8);
-            triangles.Add(4 + (i - 1) * 8); 
+            _triangles.Add(0 + (i - 1) * 8);
+            _triangles.Add(5 + (i - 1) * 8);
+            _triangles.Add(4 + (i - 1) * 8); 
             //2nd triangle
             
             //Right Face (Right Image at Vertices Image Representation folder)
-            triangles.Add(2 + (i - 1) * 8);
-            triangles.Add(6 + (i - 1) * 8);
-            triangles.Add(3 + (i - 1) * 8);
+            _triangles.Add(2 + (i - 1) * 8);
+            _triangles.Add(6 + (i - 1) * 8);
+            _triangles.Add(3 + (i - 1) * 8);
             //1st triangle 
-            triangles.Add(3 + (i - 1) * 8);
-            triangles.Add(6 + (i - 1) * 8);
-            triangles.Add(7 + (i - 1) * 8); 
+            _triangles.Add(3 + (i - 1) * 8);
+            _triangles.Add(6 + (i - 1) * 8);
+            _triangles.Add(7 + (i - 1) * 8); 
             //2nd triangle      
         }
-        mesh.Clear();
-        mesh.vertices = vertices.ToArray();
-        mesh.triangles = triangles.ToArray();
-        mesh.RecalculateNormals();
+        _mesh.Clear();
+        _mesh.vertices = _vertices.ToArray();
+        _mesh.triangles = _triangles.ToArray();
+        _mesh.RecalculateNormals();
         gameObject.AddComponent<MeshCollider>();
     }
 
@@ -139,7 +142,7 @@ public class readCSVFile : MonoBehaviour
         //Gizmos - > Green Spheres are X and Z Initial and Final Points
         //Gizmos - > Red Spheres and Lines(Always in Left) are values from negative offset of Green Spheres
         //Gizmos - > Blue Spheres and Lines(Always in Right) are values from positive offset of Green Spheres
-            GetComponent<MeshFilter>().mesh = mesh;
+            GetComponent<MeshFilter>().mesh = _mesh;
             TextAsset graphdata = Resources.Load<TextAsset>("Grapho");     
 
             string[] data = graphdata.text.Split(new char[] { '\n' });
@@ -153,7 +156,8 @@ public class readCSVFile : MonoBehaviour
                 int.TryParse(row[1], out d.y1);
                 int.TryParse(row[2], out d.x2);
                 int.TryParse(row[3], out d.y2);
-                
+                d.ChangeScale(worldScale);
+
                 //Creating Vectors with x, y and z values from the current CSV File Points
                 
                 //X
@@ -162,17 +166,17 @@ public class readCSVFile : MonoBehaviour
 
                 Vector3 targetDirX = x1 - x2; // First - Second Base values to do Cross Product(Right hand rule)
 
-                Vector3 resultX = Vector3.Cross(targetDirX.normalized, Vector3.up) * offset; //Base Cross product to get an offset value
+                Vector3 resultX = Vector3.Cross(targetDirX.normalized, Vector3.up) * widthOffset; //Base Cross product to get an offset value
                 Vector3 resultXAux = resultX + resultX; // Multiplying Base Cross Product by two
-                Vector3 resultX2 = Vector3.Cross(resultX.normalized, Vector3.up) * offset;
+                Vector3 resultX2 = Vector3.Cross(resultX.normalized, Vector3.up) * widthOffset;
 
                 //Y
-                Vector3 y1 = new Vector3(d.x1, 70, d.y1); //Top X and Z First values
-                Vector3 y2 = new Vector3(d.x2, 70, d.y2); //Top X and Z Second values
+                Vector3 y1 = new Vector3(d.x1, wallSize, d.y1); //Top X and Z First values
+                Vector3 y2 = new Vector3(d.x2, wallSize, d.y2); //Top X and Z Second values
 
                 Vector3 targetDirY = y1 - y2; // First - Second Top values to do Cross Product(Right hand rule)
                 
-                Vector3 resultY = Vector3.Cross(targetDirY.normalized, Vector3.up) * offset; //Top Cross product to get an offset value
+                Vector3 resultY = Vector3.Cross(targetDirY.normalized, Vector3.up) * widthOffset; //Top Cross product to get an offset value
                 Vector3 resultYAux = resultY + resultY; // Multiplying Top Cross Product by two
                 
                 //Creating Gizmos

@@ -1,13 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class HouseObject : MonoBehaviour
 {
-
     public HouseItensSO houseItensSo;
     private Outline _objectOutline;
-    
+
     // Start is called before the first frame update
     void Awake()
     {
@@ -22,11 +22,11 @@ public class HouseObject : MonoBehaviour
     public void RotateObject(float rotateAngle)
     {
         transform.Rotate(Vector3.up * rotateAngle);
-
     }
-    
+
     public void ScaleObject(float scaleValue)
     {
-        transform.localScale +=  Vector3.one * scaleValue;
+        transform.localScale += Vector3.one * scaleValue;
     }
+    
 }

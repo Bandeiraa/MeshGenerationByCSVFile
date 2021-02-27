@@ -20,7 +20,7 @@ public class @ArchitectController : IInputActionCollection, IDisposable
             ""actions"": [
                 {
                     ""name"": ""MousePosition"",
-                    ""type"": ""Value"",
+                    ""type"": ""PassThrough"",
                     ""id"": ""8c66c5f9-3600-432a-a1d4-1ba6f2d9beb3"",
                     ""expectedControlType"": ""Vector2"",
                     ""processors"": """",
@@ -28,7 +28,7 @@ public class @ArchitectController : IInputActionCollection, IDisposable
                 },
                 {
                     ""name"": ""MouseSelect"",
-                    ""type"": ""Button"",
+                    ""type"": ""PassThrough"",
                     ""id"": ""a2951b98-e990-49d4-8b5e-e9db1582562b"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
@@ -40,6 +40,17 @@ public class @ArchitectController : IInputActionCollection, IDisposable
                     ""name"": """",
                     ""id"": ""2e5d174c-9972-430c-af3f-87a64b6dccfd"",
                     ""path"": ""<Mouse>/position"",
+                    ""interactions"": ""Hold(duration=1)"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MousePosition"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""de71d9a8-da10-4468-8878-9c0b887bc233"",
+                    ""path"": ""<Touchscreen>/position"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -51,7 +62,7 @@ public class @ArchitectController : IInputActionCollection, IDisposable
                     ""name"": """",
                     ""id"": ""c22fbb7e-d2da-4227-9589-f98286777d84"",
                     ""path"": ""<Mouse>/leftButton"",
-                    ""interactions"": """",
+                    ""interactions"": ""Hold(duration=8)"",
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""MouseSelect"",

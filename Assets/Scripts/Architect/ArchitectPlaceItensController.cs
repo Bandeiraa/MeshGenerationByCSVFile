@@ -4,15 +4,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Serialization;
+using UnityEngine.InputSystem;
+
+
+enum CollisionType{
+    HitObject,HitFloor, HitWall
+}
 
 public class ArchitectPlaceItensController : MonoBehaviour
 {
     [SerializeField] private Transform selectedObject;
     [SerializeField] private Camera mainCamera;
     [SerializeField] private float worldY = 0;
-    [SerializeField] private LayerMask mLayerMask;
+    [SerializeField] private LayerMask hitingMask;
     [SerializeField] private LayerMask placebleAreaMask;
-    
+    private const float DistanceToFloor = 0.007f;
     public event Action<HouseObject> SelectedHouseObjectUpdated = delegate { };
     public event Action MouseButtonUnclicked = delegate { };
 
@@ -27,44 +33,92 @@ public class ArchitectPlaceItensController : MonoBehaviour
 
     private void Start()
     {
-        _playerController.Mouse.MouseSelect.performed += _ => SpawnItem();
+        _playerController.Mouse.MouseSelect.started += _ => SpawnItem();
+        _playerController.Mouse.MouseSelect.performed += _ => DragObject();
+        _playerController.Mouse.MouseSelect.canceled += _ => DropObject();
+    }
 
-        
+    private void DragObject()
+    {   
+        print("carregou");
+
+        StartCoroutine(nameof(HoldingItem));
+    }
+
+    private void DropObject()
+    {
+        print("dropou");
+        // print("ended "+ _playerController.Mouse.MousePosition.ReadValue<Vector2>());
+        StopCoroutine(nameof(HoldingItem));
     }
 
     private void SpawnItem()
     {
+        // print("started " + _playerController.Mouse.MousePosition.ReadValue<Vector2>());
+
         if (!EventSystem.current.IsPointerOverGameObject())
         {
             // _ableToSelect = false;
-            Vector3 mousePosition = _playerController.Mouse.MousePosition.ReadValue<Vector2>();
-            mousePosition = mainCamera.ScreenToWorldPoint(mousePosition);
-            mousePosition.y = worldY;
+            var mousePosition = GetMousePosition();
             Vector3 placeblePosition = mousePosition;
-            placeblePosition.y = 0.007f;
+            placeblePosition.y = DistanceToFloor;
 
-            if (IsPlacebleArea(placeblePosition))
+            if (!IsPlacebleArea(placeblePosition)) return;
+            
+            Collider hittedObject;
+            var collisionType = IsHittingObject(mousePosition,out hittedObject);
+
+            HouseObject newObject;
+            switch (collisionType)
             {
-                var hittedObject = IsHittingObject(mousePosition);
-                if (!hittedObject || lastItemSelected != hittedObject.GetComponent<HouseObject>())
-                {
-                    Transform newObject;
-                    newObject = !hittedObject ? 
-                        Instantiate(selectedObject, placeblePosition, Quaternion.identity, transform)
-                        : hittedObject.transform;
-
-                    if (lastItemSelected)
+                case CollisionType.HitObject:
+                    if (lastItemSelected != hittedObject.GetComponent<HouseObject>())
                     {
-                        lastItemSelected.ChangeItemState(false);
+                        newObject = hittedObject.GetComponentInParent<HouseObject>();
+                        UpdateLastItemSelected(newObject);
                     }
+                    break;
+                case CollisionType.HitFloor:
+                    newObject = Instantiate(selectedObject, placeblePosition, Quaternion.identity,
+                        transform).GetComponentInParent<HouseObject>();
+                    UpdateLastItemSelected(newObject);
 
-                    lastItemSelected = newObject.GetComponentInParent<HouseObject>();
-                    lastItemSelected.ChangeItemState(true);
-                    
-                    SelectedHouseObjectUpdated(lastItemSelected);
 
-                }
+                    break;
+
             }
+                
+       
+        }
+    }
+
+    private void UpdateLastItemSelected(HouseObject newObject)
+    {
+        if (lastItemSelected)
+            lastItemSelected.ChangeItemState(false);
+        
+        lastItemSelected = newObject;
+        lastItemSelected.ChangeItemState(true);
+        SelectedHouseObjectUpdated(lastItemSelected);
+    }
+
+    private Vector3 GetMousePosition()
+    {
+        Vector3 mousePosition = _playerController.Mouse.MousePosition.ReadValue<Vector2>();
+        mousePosition = mainCamera.ScreenToWorldPoint(mousePosition);
+        mousePosition.y = worldY;
+
+        return mousePosition;
+    }
+
+    IEnumerator HoldingItem()
+    {
+        while (true)
+        {
+            yield return null;
+            var mousePosition = GetMousePosition();
+            mousePosition.y = DistanceToFloor;
+            lastItemSelected.gameObject.transform.position = mousePosition;
         }
     }
 
@@ -80,6 +134,7 @@ public class ArchitectPlaceItensController : MonoBehaviour
 
     private bool IsPlacebleArea(Vector3 position)
     {
+        // var out a
         Collider[] result = new Collider[1];
         int size = Physics.OverlapBoxNonAlloc(position, selectedObject.localScale / 2, result, Quaternion.identity,
             placebleAreaMask);
@@ -88,13 +143,23 @@ public class ArchitectPlaceItensController : MonoBehaviour
         return size == 1;
     }
 
-    private Collider IsHittingObject(Vector3 position)
+    private CollisionType IsHittingObject(Vector3 mousePosition, out Collider result)
     {
-        Collider[] hitColliders = Physics.OverlapBox(position, selectedObject.localScale / 2,
-            Quaternion.identity, mLayerMask);
+        Collider[] hitColliders = Physics.OverlapBox(mousePosition, selectedObject.localScale / 2,
+            Quaternion.identity);
+        
+        if (hitColliders.Length == 1)
+        {
+            result = hitColliders[0];
+            bool isAWall = hitColliders[0].gameObject.layer == LayerMask.NameToLayer("WallsLayer");
+            return isAWall ? CollisionType.HitWall : CollisionType.HitObject;
+        }
+        
+            
+        result = hitColliders.Length != 0 ? hitColliders[0] : null;
+      
 
-
-        return hitColliders.Length != 0 ? hitColliders[0] : null;
+        return hitColliders.Length != 0 ? CollisionType.HitObject : CollisionType.HitFloor;
     }
 
 

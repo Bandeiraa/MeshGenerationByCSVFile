@@ -25,4 +25,12 @@ public class Data
     public int x2;
     public int y2;
 
+    public void ChangeScale(float newScale)
+    {
+        y1 = (int) ( y1 / newScale);
+        x1 = (int) ( x1 / newScale);
+        y2 = (int) ( y2 / newScale);
+        x2 = (int) ( x2 / newScale); 
+    }
+
 }
