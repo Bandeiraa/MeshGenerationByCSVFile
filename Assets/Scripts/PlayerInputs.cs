@@ -124,7 +124,18 @@ public class @PlayerInputs : IInputActionCollection, IDisposable
             ]
         }
     ],
-    ""controlSchemes"": []
+    ""controlSchemes"": [
+        {
+            ""name"": ""MouseKeyboard"",
+            ""bindingGroup"": ""MouseKeyboard"",
+            ""devices"": []
+        },
+        {
+            ""name"": ""Celphone"",
+            ""bindingGroup"": ""Celphone"",
+            ""devices"": []
+        }
+    ]
 }");
         // Terrain
         m_Terrain = asset.FindActionMap("Terrain", throwIfNotFound: true);
@@ -225,6 +236,24 @@ public class @PlayerInputs : IInputActionCollection, IDisposable
         }
     }
     public TerrainActions @Terrain => new TerrainActions(this);
+    private int m_MouseKeyboardSchemeIndex = -1;
+    public InputControlScheme MouseKeyboardScheme
+    {
+        get
+        {
+            if (m_MouseKeyboardSchemeIndex == -1) m_MouseKeyboardSchemeIndex = asset.FindControlSchemeIndex("MouseKeyboard");
+            return asset.controlSchemes[m_MouseKeyboardSchemeIndex];
+        }
+    }
+    private int m_CelphoneSchemeIndex = -1;
+    public InputControlScheme CelphoneScheme
+    {
+        get
+        {
+            if (m_CelphoneSchemeIndex == -1) m_CelphoneSchemeIndex = asset.FindControlSchemeIndex("Celphone");
+            return asset.controlSchemes[m_CelphoneSchemeIndex];
+        }
+    }
     public interface ITerrainActions
     {
         void OnMouseDelta(InputAction.CallbackContext context);

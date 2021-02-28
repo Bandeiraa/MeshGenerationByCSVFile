@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.Serialization;
-using UnityEngine.InputSystem;
 
 
-enum CollisionType{
-    HitObject,HitFloor, HitWall
+enum CollisionType
+{
+    HitObject,
+    HitFloor,
+    HitWall
 }
 
 public class ArchitectPlaceItensController : MonoBehaviour
@@ -29,17 +29,19 @@ public class ArchitectPlaceItensController : MonoBehaviour
     private void Awake()
     {
         _playerController = new ArchitectController();
+        
     }
 
     private void Start()
     {
+        
         _playerController.Mouse.MouseSelect.started += _ => SpawnItem();
         _playerController.Mouse.MouseSelect.performed += _ => DragObject();
         _playerController.Mouse.MouseSelect.canceled += _ => DropObject();
     }
 
     private void DragObject()
-    {   
+    {
         print("carregou");
 
         StartCoroutine(nameof(HoldingItem));
@@ -64,9 +66,9 @@ public class ArchitectPlaceItensController : MonoBehaviour
             placeblePosition.y = DistanceToFloor;
 
             if (!IsPlacebleArea(placeblePosition)) return;
-            
+
             Collider hittedObject;
-            var collisionType = IsHittingObject(mousePosition,out hittedObject);
+            var collisionType = IsHittingObject(mousePosition, out hittedObject);
 
             HouseObject newObject;
             switch (collisionType)
@@ -77,6 +79,7 @@ public class ArchitectPlaceItensController : MonoBehaviour
                         newObject = hittedObject.GetComponentInParent<HouseObject>();
                         UpdateLastItemSelected(newObject);
                     }
+
                     break;
                 case CollisionType.HitFloor:
                     newObject = Instantiate(selectedObject, placeblePosition, Quaternion.identity,
@@ -85,10 +88,7 @@ public class ArchitectPlaceItensController : MonoBehaviour
 
 
                     break;
-
             }
-                
-       
         }
     }
 
@@ -96,7 +96,7 @@ public class ArchitectPlaceItensController : MonoBehaviour
     {
         if (lastItemSelected)
             lastItemSelected.ChangeItemState(false);
-        
+
         lastItemSelected = newObject;
         lastItemSelected.ChangeItemState(true);
         SelectedHouseObjectUpdated(lastItemSelected);
@@ -147,17 +147,17 @@ public class ArchitectPlaceItensController : MonoBehaviour
     {
         Collider[] hitColliders = Physics.OverlapBox(mousePosition, selectedObject.localScale / 2,
             Quaternion.identity);
-        
+
         if (hitColliders.Length == 1)
         {
             result = hitColliders[0];
             bool isAWall = hitColliders[0].gameObject.layer == LayerMask.NameToLayer("WallsLayer");
             return isAWall ? CollisionType.HitWall : CollisionType.HitObject;
         }
-        
-            
+
+
         result = hitColliders.Length != 0 ? hitColliders[0] : null;
-      
+
 
         return hitColliders.Length != 0 ? CollisionType.HitObject : CollisionType.HitFloor;
     }

@@ -40,9 +40,9 @@ public class @ArchitectController : IInputActionCollection, IDisposable
                     ""name"": """",
                     ""id"": ""2e5d174c-9972-430c-af3f-87a64b6dccfd"",
                     ""path"": ""<Mouse>/position"",
-                    ""interactions"": ""Hold(duration=1)"",
+                    ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": ""Computer"",
                     ""action"": ""MousePosition"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -53,8 +53,19 @@ public class @ArchitectController : IInputActionCollection, IDisposable
                     ""path"": ""<Touchscreen>/position"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": ""Cellphone"",
                     ""action"": ""MousePosition"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""fc3be10e-2c34-42dc-a64d-692a8ada5420"",
+                    ""path"": ""<Touchscreen>/primaryTouch/press"",
+                    ""interactions"": ""Hold(duration=1)"",
+                    ""processors"": """",
+                    ""groups"": ""Cellphone"",
+                    ""action"": ""MouseSelect"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -64,18 +75,7 @@ public class @ArchitectController : IInputActionCollection, IDisposable
                     ""path"": ""<Mouse>/leftButton"",
                     ""interactions"": ""Hold(duration=1)"",
                     ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""MouseSelect"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""fc3be10e-2c34-42dc-a64d-692a8ada5420"",
-                    ""path"": ""<Touchscreen>/primaryTouch/tap"",
-                    ""interactions"": ""Hold(duration=1)"",
-                    ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": ""Computer"",
                     ""action"": ""MouseSelect"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -83,7 +83,18 @@ public class @ArchitectController : IInputActionCollection, IDisposable
             ]
         }
     ],
-    ""controlSchemes"": []
+    ""controlSchemes"": [
+        {
+            ""name"": ""Cellphone"",
+            ""bindingGroup"": ""Cellphone"",
+            ""devices"": []
+        },
+        {
+            ""name"": ""Computer"",
+            ""bindingGroup"": ""Computer"",
+            ""devices"": []
+        }
+    ]
 }");
         // Mouse
         m_Mouse = asset.FindActionMap("Mouse", throwIfNotFound: true);
@@ -175,6 +186,24 @@ public class @ArchitectController : IInputActionCollection, IDisposable
         }
     }
     public MouseActions @Mouse => new MouseActions(this);
+    private int m_CellphoneSchemeIndex = -1;
+    public InputControlScheme CellphoneScheme
+    {
+        get
+        {
+            if (m_CellphoneSchemeIndex == -1) m_CellphoneSchemeIndex = asset.FindControlSchemeIndex("Cellphone");
+            return asset.controlSchemes[m_CellphoneSchemeIndex];
+        }
+    }
+    private int m_ComputerSchemeIndex = -1;
+    public InputControlScheme ComputerScheme
+    {
+        get
+        {
+            if (m_ComputerSchemeIndex == -1) m_ComputerSchemeIndex = asset.FindControlSchemeIndex("Computer");
+            return asset.controlSchemes[m_ComputerSchemeIndex];
+        }
+    }
     public interface IMouseActions
     {
         void OnMousePosition(InputAction.CallbackContext context);

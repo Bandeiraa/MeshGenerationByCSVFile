@@ -111,5 +111,16 @@
             ]
         }
     ],
-    "controlSchemes": []
+    "controlSchemes": [
+        {
+            "name": "MouseKeyboard",
+            "bindingGroup": "MouseKeyboard",
+            "devices": []
+        },
+        {
+            "name": "Celphone",
+            "bindingGroup": "Celphone",
+            "devices": []
+        }
+    ]
 }
