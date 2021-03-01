@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 
 
 enum CollisionType
@@ -13,7 +14,7 @@ enum CollisionType
 
 public class ArchitectPlaceItensController : MonoBehaviour
 {
-    [SerializeField] private Transform selectedObject;
+    [SerializeField] private Transform toSpawnObject;
     [SerializeField] private Camera mainCamera;
     [SerializeField] private float worldY = 0;
     [SerializeField] private LayerMask hitingMask;
@@ -82,7 +83,7 @@ public class ArchitectPlaceItensController : MonoBehaviour
 
                     break;
                 case CollisionType.HitFloor:
-                    newObject = Instantiate(selectedObject, placeblePosition, Quaternion.identity,
+                    newObject = Instantiate(toSpawnObject, placeblePosition, Quaternion.identity,
                         transform).GetComponentInParent<HouseObject>();
                     UpdateLastItemSelected(newObject);
 
@@ -136,7 +137,7 @@ public class ArchitectPlaceItensController : MonoBehaviour
     {
         // var out a
         Collider[] result = new Collider[1];
-        int size = Physics.OverlapBoxNonAlloc(position, selectedObject.localScale / 2, result, Quaternion.identity,
+        int size = Physics.OverlapBoxNonAlloc(position, toSpawnObject.localScale / 2, result, Quaternion.identity,
             placebleAreaMask);
 
 
@@ -145,7 +146,7 @@ public class ArchitectPlaceItensController : MonoBehaviour
 
     private CollisionType IsHittingObject(Vector3 mousePosition, out Collider result)
     {
-        Collider[] hitColliders = Physics.OverlapBox(mousePosition, selectedObject.localScale / 2,
+        Collider[] hitColliders = Physics.OverlapBox(mousePosition, toSpawnObject.localScale / 2,
             Quaternion.identity);
 
         if (hitColliders.Length == 1)
@@ -163,12 +164,8 @@ public class ArchitectPlaceItensController : MonoBehaviour
     }
 
 
-    private void FixedUpdate()
+    public void UpdateSpawnableObject(Transform newObject)
     {
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
+        toSpawnObject = newObject;
     }
 }
